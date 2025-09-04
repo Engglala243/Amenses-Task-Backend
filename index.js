@@ -10,19 +10,6 @@ async function main() {
     // Create Express server
     const app = await createServer();
 
-    // Set trust proxy for Railway's reverse proxy
-    app.set("trust proxy", 1);
-
-    // Add a basic health check route if not already present
-    app.get("/", (req, res) => {
-      res.json({
-        message: "Polling Backend API is running!",
-        status: "OK",
-        timestamp: new Date().toISOString(),
-        environment: process.env.NODE_ENV || "development",
-      });
-    });
-
     // Use Railway's dynamic PORT or fallback to 5000
     const port = process.env.PORT || 5000;
 
@@ -30,6 +17,7 @@ async function main() {
     app.listen(port, "0.0.0.0", () => {
       console.log(`🚀 Server running on port ${port}`);
       console.log(`📡 Environment: ${process.env.NODE_ENV || "development"}`);
+      console.log(`🔗 Binding to 0.0.0.0:${port}`);
       if (process.env.NODE_ENV === "production") {
         console.log(
           `🌐 Railway URL: https://amenses-task-backend-production.up.railway.app`
