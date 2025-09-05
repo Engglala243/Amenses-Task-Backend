@@ -32,9 +32,18 @@ export async function createEvent({
 
 export async function listEvents({ userId, scope }) {
   if (scope === "invited") {
-    return Event.find({ participants: userId, creator: { $ne: userId } }).sort({
-      createdAt: -1,
-    });
+    // Find all invitations that are accepted for this user
+    const acceptedInvitations = await Invitation.find({
+      toUser: userId,
+      status: 'accepted'
+    }).select('event');
+    
+    const eventIds = acceptedInvitations.map(inv => inv.event);
+    
+    return Event.find({
+      _id: { $in: eventIds },
+      creator: { $ne: userId }
+    }).sort({ createdAt: -1 });
   }
   return Event.find({ creator: userId }).sort({ createdAt: -1 });
 }
